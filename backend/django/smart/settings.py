@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'allauth.socialaccount',
     'rest_auth.registration',
     'rest_framework_swagger',
     'webpack_loader'
@@ -166,13 +165,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSIONS_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'core.pagination.SmartPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # should remove these later -- only here for testing
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
-    'PAGE_SIZE': 10
 }
 
 # SMART app config

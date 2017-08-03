@@ -7,11 +7,15 @@ services:
       service: postgres
     volumes_from:
       - pgdata
+    ports:
+      - "${EXTERNAL_POSTGRES_PORT:-5432}:5432"
 
   redis:
     extends:
       file: ../docker-common.yml
       service: redis
+    ports:
+      - "${EXTERNAL_REDIS_PORT:-6379}:6379"
 
   pgdata:
     extends:
@@ -23,28 +27,32 @@ services:
       file: ../docker-common.yml
       service: smart_backend
     build: ../../backend/
-    image: rti/smart-backend:R_0_0_1
+    image: rti/smart-backend:1.0.0
+    environment:
+      - SMART_ENV=dev
+      - SECRET_KEY=${SMART_DJANGO_SECRET_KEY:-secret}
     depends_on:
       - postgres
       - redis
+    ports:
+      - "${EXTERNAL_BACKEND_PORT:-8000}:8000"
 
   smart_frontend:
     extends:
       file: ../docker-common.yml
       service: smart_frontend
     build: ../../frontend/
-    image: rti/smart-frontend:R_0_0_1
-    ports:
-      - "${EXTERNAL_FRONTEND_PORT:-3000}:3000"
-    command: node_modules/.bin/webpack-dev-server
+    image: rti/smart-frontend:1.0.0
+    command: node_modules/.bin/webpack --watch
 
   celery_worker:
     extends:
       file: ../docker-common.yml
       service: celery_worker
     build: ../../backend/
-    image: rti/smart-backend:R_0_0_1
+    image: rti/smart-backend:1.0.0
+    environment:
+      - SMART_ENV=dev
+      - SECRET_KEY=${SMART_DJANGO_SECRET_KEY:-secret}
     depends_on:
-      - postgres
-      - redis
       - smart_backend

@@ -1,0 +1,12 @@
+project_name: smart
+local_temp: /tmp/smart/
+
+user:
+  username: smart
+
+app:
+  root_dir: /opt/smart/
+  env_dir: /opt/smart/envs/
+repo:
+  url: git@gitlab.rtp.rti.org:cds/smart.git
+  branch: master

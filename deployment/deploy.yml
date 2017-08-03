@@ -1,0 +1,8 @@
+---
+
+- hosts: all
+  remote_user: root
+  roles:
+  - { role: dependencies, tags: dependencies }
+  - { role: user, tags: user }
+  - { role: deploy, tags: build }

@@ -1,0 +1,52 @@
+---
+
+- name: Remove old Docker versions
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker
+    - docker-engine
+    - docker.io
+  become: yes
+  become_method: sudo
+
+- name: Install Docker dependencies
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Add Docker’s GPG key
+  apt_key:  
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+
+- name: Add Docker to the sources list
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+  become: yes
+  become_method: sudo
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+  become: yes
+  become_method: sudo
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+
+- name: Install Compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.11.2/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+
+- name: Update Compose permissions
+  file:
+    path: /usr/local/bin/docker-compose
+    mode: "a+x"

@@ -7,25 +7,30 @@ services:
       - POSTGRES_PASSWORD=my-secret-password
       - POSTGRES_USER=smart
       - POSTGRES_DB=smart
-    ports:
-      - "${EXTERNAL_POSTGRES_PORT:-5432}:5432"
 
   redis:
     image: redis:3.0
-    ports:
-      - "${EXTERNAL_REDIS_PORT:-6379}:6379"
 
   pgdata:
     image: tianon/true
     volumes:
       - /var/lib/postgresql/data
 
+  samrt_nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    environment:
+      - DOLLAR=$$
+    volumes:
+      - ../backend/nginx.conf:/etc/nginx/conf.d/nginx.conf.template
+      - ../backend/django/static/:/code/static
+
   smart_backend:
     container_name: smart_backend
     volumes:
       - ../backend/django:/code
-    ports:
-      - "${EXTERNAL_BACKEND_PORT:-8000}:8000"
+      - ../frontend:/code/frontend
     command: ./runserver.sh
 
   smart_frontend:
@@ -37,4 +42,4 @@ services:
   celery_worker:
     volumes:
       - ../backend/django:/code
-    command: ./runcelery.sh
+    command: celery -A smart worker -l info -n default@%h

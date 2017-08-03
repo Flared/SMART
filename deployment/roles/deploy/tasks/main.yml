@@ -1,0 +1,39 @@
+---
+
+- name: Clone a fresh copy of the repo
+  connection: local
+  become: false
+  git:
+    repo: "{{ repo.url }}"
+    version: "{{ repo.branch }}"
+    dest: "{{ local_temp }}"
+    accept_hostkey: yes
+    force: yes
+    update: yes
+
+- name: Create the project root directory
+  file:
+    path: "{{ app.root_dir }}"
+    state: directory
+    owner: "{{ user.username }}"
+    recurse: yes
+
+- name: Copy the application files to the server
+  synchronize:
+    src: "{{ local_temp }}"
+    dest: "{{ app.root_dir }}"
+
+- name: Stop a running application
+  args:
+    chdir: "{{ app.env_dir }}"
+  command: docker-compose -f docker-compose.prod.yml stop
+
+- name: Build the application containers
+  args:
+    chdir: "{{ app.env_dir }}"
+  command: docker-compose -f docker-compose.prod.yml build
+
+- name: Start the application
+  args:
+    chdir: "{{ app.env_dir }}"
+  command: docker-compose -f docker-compose.prod.yml up -d

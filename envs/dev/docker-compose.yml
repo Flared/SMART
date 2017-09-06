@@ -18,6 +18,11 @@ services:
       file: ../docker-common.yml
       service: pgdata
 
+  smtp:
+    extends:
+      file: ../docker-common.yml
+      service: smtp
+
   smart_backend:
     extends:
       file: ../docker-common.yml
@@ -27,6 +32,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - smtp
 
   smart_frontend:
     extends:

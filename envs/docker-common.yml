@@ -39,3 +39,12 @@ services:
     volumes:
       - ../backend/django:/code
     command: ./runcelery.sh
+
+  smtp:
+    image: instrumentisto/postfix:latest
+    volumes:
+      - ./postfix_main.cf:/etc/postfix/main.cf
+    expose:
+      - "25"
+      - "465"
+      - "587"
